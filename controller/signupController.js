@@ -53,7 +53,7 @@ function signupController() {
                     access_token = JwtService.sign({ username })
 
                     res.status(201);
-                    return res.json({ "result": "true", "message": "SignUp success. Please proceed to Signin", "access_token": access_token });
+                    return res.json({ "result": "true", "message": "SignUp success. Please proceed to Signin" });
                 }
             } catch (error) {
                 res.json({ "result": "false", "message": "Somthing went wrong. Try again" });

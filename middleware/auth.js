@@ -4,7 +4,7 @@ const auth = async (req, res, next) => {
     let authHeader = req.headers.authorization;
     if (!authHeader) {
         res.status(400);
-        return res.json({ "result": false, "error": "Please provide a JWT token" });
+        return res.json({ "result": "false", "error": "Please provide a JWT token" });
     }
 
     const token = authHeader.split(" ")[1];
@@ -16,7 +16,7 @@ const auth = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        return res.json({ "result": false, "error": "JWT Verification Failed" });
+        return res.json({ "result": "false", "error": "JWT Verification Failed" });
     }
 }
 

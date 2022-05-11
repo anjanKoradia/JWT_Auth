@@ -26,6 +26,7 @@ function userController() {
 
                 const { fname, lname, password } = user;
 
+                res.status(200);
                 return res.json({ "result": "true", "data": { fname, lname, password } });
 
             } catch (error) {
