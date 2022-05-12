@@ -56,7 +56,7 @@ function signupController() {
                     // JWT token 
                     let access_token = await JwtService.sign({ username });
 
-                    res.status(201);
+                    res.status(200);
                     return res.json({ "result": true, "message": "SignUp success. Please proceed to Signin" });
                 }
             } catch (error) {
