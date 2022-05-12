@@ -6,11 +6,16 @@ const JwtService = require("../services/JwtService");
 function signinController() {
     return {
         login: async (req, res) => {
+            if (Object.keys(req.body).length < 2) {
+                res.status(400);
+                return res.json({ "result": false, "error": "Please provide username and password" });
+            }
+
             // validation
             const { error } = signinValidator.validate(req.body);
             if (error) {
-                res.status(406);
-                return res.json({ "result": "false", "message": error.details[0].message });
+                res.status(400);
+                return res.json({ "result": false, "error": error.details[0].message });
             }
 
             // Read users file
@@ -19,7 +24,7 @@ function signinController() {
                 usersData = fs.readFileSync("store/users.json");
                 usersDataObj = JSON.parse(usersData);
             } catch (error) {
-                return res.json({ "result": "false", "message": "Somthing went wrong. Try again" });
+                return res.json({ "result": false, "error": "Somthing went wrong. Try again" });
             }
 
             const { username, password } = req.body;
@@ -30,24 +35,24 @@ function signinController() {
                 });
                 if (!user) {
                     res.status(401);
-                    return res.json({ "result": "false", "message": "Wrong credentials. Try again" });
+                    return res.json({ "result": false, "error": "Invalid username/password" });
                 }
 
                 // compare the password
                 const match = await bcrypt.compare(password, user.password);
-
                 if (!match) {
-                    return res.json({ "result": "false", "message": "Wrong credentials. Try again" });
+                    res.status(401);
+                    return res.json({ "result": false, "error": "Invalid username/password" });
                 }
 
                 // generate token
                 let access_token = JwtService.sign({ username });
 
                 res.status(200);
-                return res.json({ "result": "true", "jwt": access_token, "message": "Signin success" });
+                return res.json({ "result": true, "jwt": access_token, "message": "Signin success" });
 
             } catch (error) {
-                res.json({ "result": "false", "message": "Somthing went wrong. Try again" });
+                res.json({ "result": false, "error": "Somthing went wrong. Try again" });
             }
         }
     }

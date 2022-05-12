@@ -1,10 +1,15 @@
 const Joi = require("joi");
+const { joiPassword } = require('joi-password');
 
 const signupValidator = Joi.object({
-    username: Joi.string().pattern(new RegExp('^[a-z]+$')).min(4).required(),
-    password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]+$')).min(5).required(),
-    fname: Joi.string().pattern(new RegExp('^[a-zA-Z]+$')).required(),
-    lname: Joi.string().pattern(new RegExp('^[a-zA-Z]+$')).required(),
+    fname: Joi.string().pattern(new RegExp('^[a-zA-Z]+$')).message("fname or lname check failed").required(),
+    lname: Joi.string().pattern(new RegExp('^[a-zA-Z]+$')).message("fname or lname check failed").required(),
+    username: Joi.string().pattern(new RegExp('^[a-z]{4,50}$')).message("username check failed").required(),
+    password: joiPassword.string().minOfLowercase(1).minOfUppercase(1).minOfNumeric(1).required().messages({
+        'password.minOfUppercase': 'password check failed',
+        'password.minOfLowercase': 'password check failed',
+        'password.minOfNumeric': 'password check failed',
+    })
 });
 
 module.exports = signupValidator;

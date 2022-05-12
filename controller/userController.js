@@ -9,8 +9,7 @@ function userController() {
                 usersData = fs.readFileSync("store/users.json");
                 usersDataObj = JSON.parse(usersData);
             } catch (error) {
-                console.log(error);
-                return res.json({ "result": "false", "message": "Somthing went wrong at time of reading file." });
+                return res.json({ "result": false, "error": "Somthing went wrong at time of reading file." });
             }
 
             let username = req.user.username;
@@ -21,16 +20,16 @@ function userController() {
                 });
                 if (!user) {
                     res.status(404);
-                    return res.json({ "result": "false", "message": "User not found. Try again" });
+                    return res.json({ "result": false, "error": "User not found. Try again" });
                 }
 
                 const { fname, lname, password } = user;
 
                 res.status(200);
-                return res.json({ "result": "true", "data": { fname, lname, password } });
+                return res.json({ "result": true, "data": { fname, lname, password } });
 
             } catch (error) {
-                res.json({ "result": "false", "message": "Somthing went wrong. Try again" });
+                res.json({ "result": false, "error": "Somthing went wrong. Try again" });
             }
         }
     }

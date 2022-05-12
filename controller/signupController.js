@@ -6,11 +6,16 @@ const JwtService = require("../services/JwtService");
 function signupController() {
     return {
         register: async (req, res) => {
+            if (Object.keys(req.body).length < 4) {
+                res.status(400);
+                return res.json({ "result": false, "error": "fields can't be empty" });
+            }
+
             // Validation check for filelds
             const { error } = signupValidator.validate(req.body);
             if (error) {
-                res.status(406);
-                return res.json({ "result": "false", "message": error.details[0].message });
+                res.status(400);
+                return res.json({ "result": false, "error": error.details[0].message });
             }
 
             // Read users file
@@ -19,7 +24,7 @@ function signupController() {
                 usersData = fs.readFileSync("store/users.json");
                 usersDataObj = JSON.parse(usersData);
             } catch (error) {
-                return res.json({ "result": "false", "message": "Somthing went wrong at time of reading file." });
+                return res.json({ "result": false, "error": "Somthing went wrong at time of reading file." });
             }
 
             const { username, password, fname, lname } = req.body;
@@ -31,15 +36,14 @@ function signupController() {
                 });
                 if (user) {
                     exist = true;
-                    res.status(406);
-                    return res.json({ "result": "false", "message": "User is already exists" });
+                    res.status(400);
+                    return res.json({ "result": false, "error": "username already exists" });
                 }
 
-                // Encode password (Hase Password)
-                const hashedPassword = await bcrypt.hash(password, 10);
-
-                let access_token;
                 if (exist == false) {
+                    // Encode password (Hase Password)
+                    const hashedPassword = await bcrypt.hash(password, 10);
+
                     // Add new user to json file
                     usersDataObj.push({
                         username,
@@ -50,13 +54,13 @@ function signupController() {
                     fs.writeFileSync("store/users.json", JSON.stringify(usersDataObj));
 
                     // JWT token 
-                    access_token = JwtService.sign({ username })
+                    let access_token = await JwtService.sign({ username });
 
                     res.status(201);
-                    return res.json({ "result": "true", "message": "SignUp success. Please proceed to Signin" });
+                    return res.json({ "result": true, "message": "SignUp success. Please proceed to Signin" });
                 }
             } catch (error) {
-                res.json({ "result": "false", "message": "Somthing went wrong. Try again" });
+                res.json({ "result": false, "error": "Somthing went wrong. Try again" });
             }
         }
     }
